@@ -1,0 +1,184 @@
+import { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextBasedChannel } from "discord.js";
+import { Song } from "./Song";
+import { getSongTime } from "./SongTime";
+import shuffleArray from "shuffle-array";
+import youtube from "play-dl";
+import { YouTubeVideo } from "play-dl";
+import validUrl from "valid-url";
+
+export class SongQueue {
+  private queue: Array<Song> = new Array<Song>();
+  private displayItems: number = 20;
+  private searchResults: number = 5;
+
+  /**
+   * Get the total number of songs in queue
+   * @returns Total length
+   */
+  public size(): number {
+    return this.queue.length;
+  }
+
+  /**
+   * Get the next song in queue
+   * @returns Next song
+   */
+  public getNext(): Song | undefined {
+    return this.queue.shift();
+  }
+
+  /**
+   * Print out all queued songs
+   * @param embed Message embed element
+   * @param remaining Current song remaining time
+   * @returns Updated embed
+   */
+  public print(embed: EmbedBuilder, remaining: number): EmbedBuilder {
+    // Counter for total queue time
+    let seconds = 0;
+    // Print all songs
+    if (this.queue.length > 0) {
+      for (let i = 0; i < this.queue.length; i++) {
+        if (i < this.displayItems) {
+          embed.addFields({ name: "Position: " + (i + 1), value: this.queue[i].title, inline: true });
+        }
+        seconds += this.queue[i].length;
+      }
+      if (this.queue.length > this.displayItems) {
+        const otherSongs = this.queue.length - this.displayItems;
+        embed.addFields({ name: "...", value: otherSongs + " more song(s)", inline: true });
+      }
+      // Display total queue time remaining
+      embed.setFooter({
+        text: "Total remaining: " + getSongTime(seconds + remaining),
+      });
+    } else {
+      embed.setFooter({
+        text: "No songs queued",
+      });
+    }
+    return embed;
+  }
+
+  /**
+   * Add a youtube video to the queue
+   * @param youtubeVideoDetails Youtube video details object
+   * @param textChannel The text channel the command was sent in
+   * @returns Song title
+   */
+  private queueYoutubeSong(youtubeVideoDetails: YouTubeVideo, textChannel: TextBasedChannel): string {
+    const title = youtubeVideoDetails.title ?? youtubeVideoDetails.url;
+    const song = new Song(title, youtubeVideoDetails.durationInSec, youtubeVideoDetails.url, textChannel);
+    this.queue.push(song);
+    return title;
+  }
+
+  /**
+   * Add a youtube video to queue with by link
+   * @param youtubeUrl Validated link to youtube video
+   * @param textChannel The text channel the command was sent in
+   * @returns Song title
+   */
+  private async addYoutubeLink(youtubeUrl: string, textChannel: TextBasedChannel): Promise<string> {
+    try {
+      const yt_info = await youtube.video_info(youtubeUrl);
+      return this.queueYoutubeSong(yt_info.video_details, textChannel);
+    } catch (err) {
+      return "Computer says no";
+    }
+  }
+
+  /**
+   * Add all songs in a youtube playlist to the queue
+   * @param youtubePlaylistUrl Validated link to youtube playlist
+   * @param textChannel The text channel the command was sent in
+   * @returns Playlist title
+   */
+  private async addYoutubePlaylist(youtubePlaylistUrl: string, textChannel: TextBasedChannel): Promise<string | any> {
+    await youtube
+      .playlist_info(youtubePlaylistUrl, { incomplete: true })
+      .then(async (playlist) => {
+        await playlist
+          .all_videos()
+          .then((videos) => {
+            for (let $i = 0; $i < videos.length; $i++) {
+              // Add each song to the list
+              this.queueYoutubeSong(videos[$i], textChannel);
+            }
+            return playlist.title;
+          })
+          .catch((error) => {
+            return `Failed to add all videos: ${error}`;
+          });
+      })
+      .catch((error) => {
+        return `Failed to add: ${error}`;
+      });
+  }
+
+  /**
+   * Queue a song by youtube link or search query
+   * @param songString Link or search query
+   * @param textChannel The text channel the command was sent in
+   * @returns Queued song or playlist title
+   */
+  public async queueSong(songString: string, textChannel: TextBasedChannel): Promise<string> {
+    if (validUrl.isUri(songString)) {
+      // Get from link
+      if (youtube.yt_validate(songString) == "video") {
+        // Add single link
+        return this.addYoutubeLink(songString, textChannel);
+      } else if (youtube.yt_validate(songString) == "playlist") {
+        // Add playlist links
+        return this.addYoutubePlaylist(songString, textChannel);
+      }
+    } else {
+      // Get top result from search
+      const yt_info = await youtube.search(songString, { limit: 1 });
+      return this.queueYoutubeSong(yt_info[0], textChannel);
+    }
+    return "Why you do me like this? :(";
+  }
+
+  /**
+   * Search for and select from top 5 search query results
+   * @param select Select message element
+   * @param searchString Search query
+   * @returns Updated select message element
+   */
+  public async searchYoutube(select: StringSelectMenuBuilder, searchString: string): Promise<StringSelectMenuBuilder> {
+    const yt_info = await youtube.search(searchString, { limit: this.searchResults });
+    const formatter = Intl.NumberFormat("en", { notation: "compact" });
+    yt_info.forEach((song) => {
+      const title = song.title ?? song.url;
+      select.addOptions(
+        new StringSelectMenuOptionBuilder()
+          .setLabel(title)
+          .setDescription(song.channel + " - " + getSongTime(song.durationInSec) + " - " + formatter.format(song.views) + " views")
+          .setValue(song.url)
+      );
+    });
+    return select;
+  }
+
+  /**
+   * Shuffle the queued songs
+   * @returns Output to text channel
+   */
+  public shuffle(): string {
+    if (this.queue.length > 0) {
+      shuffleArray(this.queue);
+      return "Fucked that shit up";
+    } else {
+      return "https://tenor.com/view/ive-got-nothing-left-crying-easterenders-got-nothin-left-nothing-left-gif-14296691";
+    }
+  }
+
+  /**
+   * Clear all queued songs
+   */
+  public clear(): string {
+    this.queue = new Array<Song>();
+    return "Takin' out the trash";
+  }
+}
