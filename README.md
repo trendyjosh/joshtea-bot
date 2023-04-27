@@ -1,6 +1,6 @@
 # Music Bot
 
-Features:
+## Features:
 
 - /play = Search for a song or play a YouTube playlist/song link
 - /search = Submit search query then pick from top 5 YouTube results
