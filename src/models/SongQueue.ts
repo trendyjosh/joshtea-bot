@@ -95,10 +95,10 @@ export class SongQueue {
    * @returns Playlist title
    */
   private async addYoutubePlaylist(youtubePlaylistUrl: string, textChannel: TextBasedChannel): Promise<string | any> {
-    await youtube
+    return await youtube
       .playlist_info(youtubePlaylistUrl, { incomplete: true })
       .then(async (playlist) => {
-        await playlist
+        return await playlist
           .all_videos()
           .then((videos) => {
             for (let $i = 0; $i < videos.length; $i++) {
@@ -127,10 +127,10 @@ export class SongQueue {
       // Get from link
       if (youtube.yt_validate(songString) == "video") {
         // Add single link
-        return this.addYoutubeLink(songString, textChannel);
+        return await this.addYoutubeLink(songString, textChannel);
       } else if (youtube.yt_validate(songString) == "playlist") {
         // Add playlist links
-        return this.addYoutubePlaylist(songString, textChannel);
+        return await this.addYoutubePlaylist(songString, textChannel);
       }
     } else {
       // Get top result from search
@@ -158,6 +158,7 @@ export class SongQueue {
           .setValue(song.url)
       );
     });
+    select.addOptions(new StringSelectMenuOptionBuilder().setLabel("None").setDescription("None of the above").setValue("none"));
     return select;
   }
 
@@ -178,7 +179,11 @@ export class SongQueue {
    * Clear all queued songs
    */
   public clear(): string {
-    this.queue = new Array<Song>();
-    return "Takin' out the trash";
+    if (this.queue.length > 0) {
+      this.queue = new Array<Song>();
+      return "Takin' out the trash";
+    } else {
+      return "https://tenor.com/view/ive-got-nothing-left-crying-easterenders-got-nothin-left-nothing-left-gif-14296691";
+    }
   }
 }

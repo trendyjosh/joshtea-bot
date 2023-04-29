@@ -32,6 +32,6 @@ export class SearchCommand extends Command {
     if (string && interaction.guild) {
       message = await container.player.search(interaction, string);
     }
-    console.log(message);
+    // console.log(message);
   }
 }

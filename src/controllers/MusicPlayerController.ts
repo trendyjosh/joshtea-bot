@@ -71,6 +71,16 @@ export class MusicPlayerController {
   }
 
   /**
+   * Shuffle the queue
+   * @param interaction Input command
+   * @returns Message output
+   */
+  public shuffle(interaction: Command.ChatInputCommandInteraction) {
+    const serverId = interaction.guild!.id;
+    return this.servers.get(serverId)!.shuffle();
+  }
+
+  /**
    * Clear the queue
    * @param interaction Input command
    * @returns Message output

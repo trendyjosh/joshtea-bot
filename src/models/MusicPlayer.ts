@@ -170,6 +170,7 @@ export class MusicPlayer {
       const confirmation = await response.awaitMessageComponent({ filter, time: 300_000 });
       if (confirmation instanceof StringSelectMenuInteraction && confirmation.customId === "search") {
         const songString = confirmation.values[0];
+        if (songString === "none") return response.edit({ content: "None selected.", components: [] });
         const message = await this.addSong(interaction, songString);
         await confirmation.update({ content: message, components: [] });
       }
@@ -259,13 +260,18 @@ export class MusicPlayer {
   }
 
   /**
+   * Shuffle the queue.
+   * @returns The message string
+   */
+  public shuffle() {
+    return this.queue.shuffle();
+  }
+
+  /**
    * Stop playing and clear queue.
    * @returns The message string
    */
   public clear() {
-    if (this.queue.size() > 0) {
-      this.queue.clear();
-    }
-    return "Cleared!";
+    return this.queue.clear();
   }
 }
