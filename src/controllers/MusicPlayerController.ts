@@ -69,4 +69,14 @@ export class MusicPlayerController {
     const serverId = interaction.guild!.id;
     return this.servers.get(serverId)!.stop();
   }
+
+  /**
+   * Clear the queue
+   * @param interaction Input command
+   * @returns Message output
+   */
+  public clear(interaction: Command.ChatInputCommandInteraction) {
+    const serverId = interaction.guild!.id;
+    return this.servers.get(serverId)!.clear();
+  }
 }

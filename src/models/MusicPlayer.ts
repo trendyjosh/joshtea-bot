@@ -257,4 +257,15 @@ export class MusicPlayer {
     }
     return `Stopping...`;
   }
+
+  /**
+   * Stop playing and clear queue.
+   * @returns The message string
+   */
+  public clear() {
+    if (this.queue.size() > 0) {
+      this.queue.clear();
+    }
+    return "Cleared!";
+  }
 }
