@@ -23,8 +23,6 @@ export class SkipCommand extends Command {
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<InteractionResponse<boolean>> {
     const message = await container.player.skip(interaction);
-    return interaction.reply({
-      content: message,
-    });
+    return interaction.reply({ content: message });
   }
 }

@@ -27,11 +27,6 @@ export class SearchCommand extends Command {
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<void> {
     interaction.deferReply();
-    const string = interaction.options.getString("input")?.trim();
-    let message: string = "What is that";
-    if (string && interaction.guild) {
-      message = await container.player.search(interaction, string);
-    }
-    // console.log(message);
+    await container.player.search(interaction);
   }
 }

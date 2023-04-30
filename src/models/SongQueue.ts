@@ -12,7 +12,7 @@ export class SongQueue {
   private searchResults: number = 5;
 
   /**
-   * Get the total number of songs in queue
+   * Get the total number of songs in queue.
    * @returns Total length
    */
   public size(): number {
@@ -20,7 +20,7 @@ export class SongQueue {
   }
 
   /**
-   * Get the next song in queue
+   * Get the next song in queue.
    * @returns Next song
    */
   public getNext(): Song | undefined {
@@ -28,7 +28,7 @@ export class SongQueue {
   }
 
   /**
-   * Print out all queued songs
+   * Print out all queued songs.
    * @param embed Message embed element
    * @param remaining Current song remaining time
    * @returns Updated embed
@@ -61,7 +61,7 @@ export class SongQueue {
   }
 
   /**
-   * Add a youtube video to the queue
+   * Add a youtube video to the queue.
    * @param youtubeVideoDetails Youtube video details object
    * @param textChannel The text channel the command was sent in
    * @returns Song title
@@ -74,7 +74,7 @@ export class SongQueue {
   }
 
   /**
-   * Add a youtube video to queue with by link
+   * Add a youtube video to queue with by link.
    * @param youtubeUrl Validated link to youtube video
    * @param textChannel The text channel the command was sent in
    * @returns Song title
@@ -89,7 +89,7 @@ export class SongQueue {
   }
 
   /**
-   * Add all songs in a youtube playlist to the queue
+   * Add all songs in a youtube playlist to the queue.
    * @param youtubePlaylistUrl Validated link to youtube playlist
    * @param textChannel The text channel the command was sent in
    * @returns Playlist title
@@ -117,7 +117,7 @@ export class SongQueue {
   }
 
   /**
-   * Queue a song by youtube link or search query
+   * Queue a song by youtube link or search query.
    * @param songString Link or search query
    * @param textChannel The text channel the command was sent in
    * @returns Queued song or playlist title
@@ -141,7 +141,7 @@ export class SongQueue {
   }
 
   /**
-   * Search for and select from top 5 search query results
+   * Search for and select from top 5 search query results.
    * @param select Select message element
    * @param searchString Search query
    * @returns Updated select message element
@@ -163,7 +163,7 @@ export class SongQueue {
   }
 
   /**
-   * Shuffle the queued songs
+   * Shuffle the queued songs.
    * @returns Output to text channel
    */
   public shuffle(): string {
@@ -176,12 +176,27 @@ export class SongQueue {
   }
 
   /**
-   * Clear all queued songs
+   * Clear all queued songs.
+   * @returns Response message
    */
   public clear(): string {
     if (this.queue.length > 0) {
       this.queue = new Array<Song>();
       return "Takin' out the trash";
+    } else {
+      return "https://tenor.com/view/ive-got-nothing-left-crying-easterenders-got-nothin-left-nothing-left-gif-14296691";
+    }
+  }
+
+  /**
+   * Remove a song from chosen position in the queue.
+   * @param position Position of the song in the queue
+   * @returns Response message
+   */
+  public remove(position: number): string {
+    if (this.queue.length > 0) {
+      this.queue.splice(position - 1, 1);
+      return "Binned it";
     } else {
       return "https://tenor.com/view/ive-got-nothing-left-crying-easterenders-got-nothin-left-nothing-left-gif-14296691";
     }

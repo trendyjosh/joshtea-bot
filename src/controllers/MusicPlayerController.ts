@@ -17,27 +17,30 @@ export class MusicPlayerController {
   /**
    * Search for a song or play a link and start the audio
    * @param interaction Input command
-   * @param songString Youtube link or search query
    * @returns Message output
    */
-  public async play(interaction: Command.ChatInputCommandInteraction, songString: string): Promise<string> {
+  public async play(interaction: Command.ChatInputCommandInteraction): Promise<string> {
     const serverId = interaction.guild!.id;
+    const songString = interaction.options.getString("input")?.trim();
+    if (!songString) return "What is that?";
     // Add a song/playlist to the queue and play next
-    const message = (await this.servers.get(serverId)!.addSong(interaction, songString)) ?? "Playback failed";
-    return message;
+    return (await this.servers.get(serverId)!.addSong(interaction, songString)) ?? "Playback failed";
   }
 
   /**
    * Search for and select from top 5 search query results
    * @param interaction Input command
-   * @param searchString Youtube search query
    * @returns Message output
    */
-  public async search(interaction: Command.ChatInputCommandInteraction, searchString: string): Promise<string> {
+  public async search(interaction: Command.ChatInputCommandInteraction): Promise<void> {
     const serverId = interaction.guild!.id;
+    const searchString = interaction.options.getString("input")?.trim();
+    if (!searchString) {
+      await interaction.editReply({ content: "What is that?" });
+      return;
+    }
     // Search for top 5 results
     await this.servers.get(serverId)!.searchResults(interaction, searchString);
-    return "Successfully added";
   }
 
   /**
@@ -87,6 +90,7 @@ export class MusicPlayerController {
    */
   public clear(interaction: Command.ChatInputCommandInteraction) {
     const serverId = interaction.guild!.id;
-    return this.servers.get(serverId)!.clear();
+    const songPosition = interaction.options.getInteger("position");
+    return this.servers.get(serverId)!.clear(songPosition);
   }
 }

@@ -268,10 +268,15 @@ export class MusicPlayer {
   }
 
   /**
-   * Stop playing and clear queue.
+   * Clear all queued songs or just the one in selected position.
+   * @param position Position of song in queue
    * @returns The message string
    */
-  public clear() {
-    return this.queue.clear();
+  public clear(position: number | null) {
+    if (position) {
+      return this.queue.remove(position);
+    } else {
+      return this.queue.clear();
+    }
   }
 }

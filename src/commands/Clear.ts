@@ -12,6 +12,12 @@ export class ClearCommand extends Command {
       builder //
         .setName(this.name)
         .setDescription(this.description)
+        .addIntegerOption((option) =>
+          option //
+            .setName("position")
+            .setDescription("Position of specific song in queue to clear.")
+            .setRequired(false)
+        )
     );
   }
 

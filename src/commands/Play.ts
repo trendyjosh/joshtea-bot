@@ -28,13 +28,7 @@ export class PlayCommand extends Command {
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<Message<boolean>> {
     interaction.deferReply();
-    const string = interaction.options.getString("input")?.trim();
-    let message: string = "What is that";
-    if (string && interaction.guild) {
-      message = await container.player.play(interaction, string);
-    }
-    return interaction.editReply({
-      content: message,
-    });
+    const message = await container.player.play(interaction);
+    return interaction.editReply({ content: message });
   }
 }

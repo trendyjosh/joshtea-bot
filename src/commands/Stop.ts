@@ -22,8 +22,6 @@ export class StopCommand extends Command {
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<InteractionResponse<boolean>> {
     const message = await container.player.stop(interaction);
-    return interaction.reply({
-      content: message,
-    });
+    return interaction.reply({ content: message });
   }
 }
