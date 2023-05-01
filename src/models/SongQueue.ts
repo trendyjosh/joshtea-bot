@@ -150,7 +150,7 @@ export class SongQueue {
     const yt_info = await youtube.search(searchString, { limit: this.searchResults });
     const formatter = Intl.NumberFormat("en", { notation: "compact" });
     yt_info.forEach((song) => {
-      const title = song.title ?? song.url;
+      const title = song.title?.slice(0, 99) ?? song.url;
       select.addOptions(
         new StringSelectMenuOptionBuilder()
           .setLabel(title)
