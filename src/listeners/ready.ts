@@ -8,6 +8,6 @@ import { ActivityType } from "discord.js";
 })
 export class ReadyListener extends Listener {
   run(client: SapphireClient) {
-    client.user?.setActivity("with your mum", { type: ActivityType.Playing });
+    client.user?.setActivity("sick beats", { type: ActivityType.Playing });
   }
 }
