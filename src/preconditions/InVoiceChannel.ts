@@ -8,7 +8,6 @@ export class InVoiceChannelPrecondition extends Precondition {
 
   /**
    * Check the the interaction user is in a voice channel.
-   *
    * @param interaction The command interaction
    * @returns Error if not in a channel
    */

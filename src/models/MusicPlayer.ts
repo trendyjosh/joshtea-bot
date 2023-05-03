@@ -2,7 +2,7 @@ import { AudioPlayer, AudioPlayerStatus, VoiceConnection, createAudioPlayer, cre
 import { Song } from "./Song";
 import youtube from "play-dl";
 import { SongQueue } from "./SongQueue";
-import { ActionRowBuilder, EmbedBuilder, GuildMember, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceBasedChannel, VoiceState } from "discord.js";
+import { ActionRowBuilder, EmbedBuilder, GuildMember, InteractionReplyOptions, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceBasedChannel, VoiceState } from "discord.js";
 import { getSongTime } from "./SongTime";
 import { Command } from "@sapphire/framework";
 
@@ -47,6 +47,15 @@ export class MusicPlayer {
   }
 
   /**
+   * Leave the voice channel and reset the player variables.
+   */
+  public leaveVoice(): void {
+    this.queue = new SongQueue();
+    this.player = new AudioPlayer();
+    this.connection.destroy();
+  }
+
+  /**
    * Handle AudioPlayer idle state.
    * @param voiceChannel The current voice channel
    */
@@ -54,9 +63,7 @@ export class MusicPlayer {
     this.stopPlaying();
     // Die if no listeners
     if (voiceChannel.members.size <= 1) {
-      this.queue = new SongQueue();
-      this.player = new AudioPlayer();
-      this.connection.destroy();
+      this.leaveVoice();
     }
     // Play next queued song
     if (this.queue.size() > 0) {
@@ -155,7 +162,7 @@ export class MusicPlayer {
    * @param songString The song search/url string
    * @returns Interaction response message
    */
-  public async searchResults(interaction: Command.ChatInputCommandInteraction, searchString: string) {
+  public async searchResults(interaction: Command.ChatInputCommandInteraction, searchString: string): Promise<any> {
     let select = new StringSelectMenuBuilder().setCustomId("search").setPlaceholder("Make a selection!");
     select = await this.queue.searchYoutube(select, searchString);
 
@@ -223,7 +230,7 @@ export class MusicPlayer {
    * Print out the currently playing song info and get queued songs.
    * @returns The message embed
    */
-  public printQueue() {
+  public printQueue(): InteractionReplyOptions {
     let embed = new EmbedBuilder().setColor(0x274437).setTitle("Current Song").setAuthor({ name: "Music Queue" });
     const dateObj = new Date();
     let remaining = Math.round(dateObj.getTime() / 1000) - this.currentSong.started;
@@ -237,7 +244,7 @@ export class MusicPlayer {
    * Skip the currently playing song.
    * @returns The message string
    */
-  public skipSong() {
+  public skipSong(): string {
     const previousSong = this.currentSong.title;
     if (this.queue.size() > 0) {
       this.playNext();
@@ -251,7 +258,7 @@ export class MusicPlayer {
    * Stop playing and clear queue.
    * @returns The message string
    */
-  public stop() {
+  public stop(): string {
     this.stopPlaying();
     if (this.queue.size() > 0) {
       this.queue.clear();
@@ -263,7 +270,7 @@ export class MusicPlayer {
    * Shuffle the queue.
    * @returns The message string
    */
-  public shuffle() {
+  public shuffle(): string {
     return this.queue.shuffle();
   }
 
@@ -272,7 +279,7 @@ export class MusicPlayer {
    * @param position Position of song in queue
    * @returns The message string
    */
-  public clear(position: number | null) {
+  public clear(position: number | null): string {
     if (position) {
       return this.queue.remove(position);
     } else {

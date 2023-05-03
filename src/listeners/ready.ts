@@ -1,12 +1,12 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { Listener, SapphireClient } from "@sapphire/framework";
+import { Events, Listener, SapphireClient } from "@sapphire/framework";
 import { ActivityType } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
   once: true,
-  event: "ready",
+  event: Events.ClientReady,
 })
-export class ReadyListener extends Listener {
+export class ReadyListener extends Listener<typeof Events.ClientReady> {
   run(client: SapphireClient) {
     client.user?.setActivity("sick beats", { type: ActivityType.Playing });
   }
