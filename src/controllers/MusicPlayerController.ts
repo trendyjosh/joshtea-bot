@@ -44,16 +44,6 @@ export class MusicPlayerController {
   }
 
   /**
-   * Print out the queue and currently playing song.
-   * @param interaction Input command
-   * @returns Message output
-   */
-  public queue(interaction: Command.ChatInputCommandInteraction): InteractionReplyOptions {
-    const serverId = interaction.guild!.id;
-    return this.servers.get(serverId)!.printQueue();
-  }
-
-  /**
    * Skip currently playing song.
    * @param interaction Input command
    * @returns Message output
@@ -64,13 +54,13 @@ export class MusicPlayerController {
   }
 
   /**
-   * Stop playing and clear the queue.
+   * Print out the queue and currently playing song.
    * @param interaction Input command
    * @returns Message output
    */
-  public stop(interaction: Command.ChatInputCommandInteraction): string {
-    const serverId: string = interaction.guild!.id;
-    return this.servers.get(serverId)!.stop();
+  public queue(interaction: Command.ChatInputCommandInteraction): InteractionReplyOptions {
+    const serverId = interaction.guild!.id;
+    return this.servers.get(serverId)!.printQueue();
   }
 
   /**
@@ -92,6 +82,16 @@ export class MusicPlayerController {
     const serverId: string = interaction.guild!.id;
     const songPosition = interaction.options.getInteger("position");
     return this.servers.get(serverId)!.clear(songPosition);
+  }
+
+  /**
+   * Stop playing and clear the queue.
+   * @param interaction Input command
+   * @returns Message output
+   */
+  public stop(interaction: Command.ChatInputCommandInteraction): string {
+    const serverId: string = interaction.guild!.id;
+    return this.servers.get(serverId)!.stop();
   }
 
   /**
