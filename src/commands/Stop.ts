@@ -3,7 +3,7 @@ import { ChatInputCommand, Command, container } from "@sapphire/framework";
 import { InteractionResponse } from "discord.js";
 
 @ApplyOptions<Command.Options>({
-  description: "Skip current song.",
+  description: "Stop playing.",
   preconditions: ["InVoiceChannel", "HasServer", "IsPlaying"],
 })
 export class StopCommand extends Command {
