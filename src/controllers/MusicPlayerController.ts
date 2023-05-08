@@ -1,7 +1,7 @@
 // "use strict";
-import { Command } from "@sapphire/framework";
+import { Command, CommandStore } from "@sapphire/framework";
 import { MusicPlayer } from "../models/MusicPlayer";
-import { InteractionReplyOptions } from "discord.js";
+import { EmbedBuilder, InteractionReplyOptions } from "discord.js";
 
 export class MusicPlayerController {
   private servers: Map<string, MusicPlayer> = new Map<string, MusicPlayer>();
@@ -104,5 +104,23 @@ export class MusicPlayerController {
       musicPlayer.stopPlaying();
       this.servers.set(serverId, new MusicPlayer());
     }
+  }
+
+  /**
+   * Print out the application commands.
+   * @param commands All bot commands
+   * @returns Message embed
+   */
+  public help(commands: CommandStore): InteractionReplyOptions {
+    const embed = new EmbedBuilder().setColor(0x274437).setTitle("All commands");
+    let commandsString: string = "";
+    commands.each((command, key, col) => {
+      commandsString += `/${command.name} - ${command.description}`;
+      if (!Object.is(commands.last(), command)) {
+        commandsString += "\n";
+      }
+    });
+    embed.setDescription(commandsString);
+    return { embeds: [embed] };
   }
 }
