@@ -26,7 +26,7 @@ export class SearchCommand extends Command {
    * @returns An edited response confirmation
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<void> {
-    interaction.deferReply();
+    await interaction.deferReply();
     await container.player.search(interaction);
   }
 }

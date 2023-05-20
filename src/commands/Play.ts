@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { ChatInputCommand, Command, container } from "@sapphire/framework";
-import { Message } from "discord.js";
+import { InteractionResponse, Message } from "discord.js";
 
 @ApplyOptions<Command.Options>({
   description: "Search for a song or play a youtube link.",
@@ -27,7 +27,7 @@ export class PlayCommand extends Command {
    * @returns An edited response confirmation
    */
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<Message<boolean>> {
-    interaction.deferReply();
+    await interaction.deferReply();
     const message = await container.player.play(interaction);
     return interaction.editReply({ content: message });
   }
