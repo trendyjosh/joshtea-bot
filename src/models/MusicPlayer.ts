@@ -42,7 +42,7 @@ export class MusicPlayer {
    */
   public stopPlaying(): void {
     this.isPlaying = false;
-    this.player.stop();
+    this.player?.stop();
     this.clearSong();
   }
 
