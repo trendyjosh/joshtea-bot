@@ -11,10 +11,8 @@ export class UserLeftListener extends Listener<typeof Events.VoiceStateUpdate> {
       oldChannel = oldState.channel,
       newChannel = newState.channel;
     if (oldChannel !== null && clientVoiceChannel != null) {
-      if (!newChannel || newChannel.id !== clientVoiceChannel.id) {
-        if (oldChannel.members.size <= 1 && oldChannel.id === clientVoiceChannel.id) {
-          container.player.leave(oldState.guild.id);
-        }
+      if (oldChannel.id == clientVoiceChannel.id && clientVoiceChannel.members.size <= 1) {
+        container.player.leave(oldState.guild.id);
       }
     }
   }
