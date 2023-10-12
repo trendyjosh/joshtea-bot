@@ -102,6 +102,7 @@ export class MusicPlayerController {
     const musicPlayer = this.servers.get(serverId);
     if (musicPlayer) {
       musicPlayer.stopPlaying();
+      musicPlayer.leaveVoice();
       this.servers.set(serverId, new MusicPlayer());
     }
   }
