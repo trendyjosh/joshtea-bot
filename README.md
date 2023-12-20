@@ -1,5 +1,7 @@
 # Music Bot
 
+A Discord bot for queuing and playing music created using the [Saphire](https://www.sapphirejs.dev/) Discordjs framework.
+
 ## Features:
 
 - /play = Search for a song or play a YouTube playlist/song link
