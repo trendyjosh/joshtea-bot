@@ -1,6 +1,6 @@
 # Music Bot
 
-A Discord bot for queuing and playing music created using the [Saphire](https://www.sapphirejs.dev/) Discordjs framework.
+A Discord bot for queuing and playing music created using the [Sapphire](https://www.sapphirejs.dev/) Discordjs framework.
 
 ## Features:
 
