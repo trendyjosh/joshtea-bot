@@ -13,6 +13,11 @@ export class MusicPlayer {
   private connection!: VoiceConnection;
   private player!: AudioPlayer;
 
+  constructor(
+    //
+    private favourites: Array<Song> = Array<Song>()
+  ) {}
+
   /**
    * Set the currently playing song info.
    * @param song The song being playing

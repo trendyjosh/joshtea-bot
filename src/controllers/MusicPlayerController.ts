@@ -20,8 +20,11 @@ export class MusicPlayerController {
    * Create a new server mapping.
    * @param serverId The guild id
    */
-  public addServer(serverId: string): void {
-    this.servers.set(serverId, new MusicPlayer());
+  public async addServer(serverId: string): Promise<void> {
+    // Retrieve previously stored server data
+    const storedServer: any = await this.storage.get(serverId);
+    // Initialise new server
+    this.servers.set(serverId, new MusicPlayer(storedServer?.favourites));
   }
 
   /**
