@@ -2,9 +2,19 @@
 import { Command, CommandStore } from "@sapphire/framework";
 import { MusicPlayer } from "../models/MusicPlayer";
 import { EmbedBuilder, InteractionReplyOptions } from "discord.js";
+import Keyv from "keyv";
 
 export class MusicPlayerController {
   private servers: Map<string, MusicPlayer> = new Map<string, MusicPlayer>();
+  private storage: Keyv;
+
+  /**
+   * Initialise a new controller instance.
+   */
+  public constructor() {
+    // Initialise storage object
+    this.storage = new Keyv("sqlite://database/storage.sqlite");
+  }
 
   /**
    * Create a new server mapping.
