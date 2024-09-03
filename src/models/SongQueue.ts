@@ -84,6 +84,7 @@ export class SongQueue {
       const yt_info = await youtube.video_info(youtubeUrl);
       return this.queueYoutubeSong(yt_info.video_details, textChannel);
     } catch (err) {
+      console.log(err);
       return "Computer says no";
     }
   }
