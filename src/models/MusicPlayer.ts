@@ -1,6 +1,7 @@
 import { AudioPlayer, AudioPlayerStatus, VoiceConnection, createAudioPlayer, createAudioResource, NoSubscriberBehavior, entersState, VoiceConnectionStatus, joinVoiceChannel } from "@discordjs/voice";
 import { Song } from "./Song";
-import youtube from "play-dl";
+// import youtube from "play-dl";
+import ytdl from "@distube/ytdl-core";
 import { SongQueue } from "./SongQueue";
 import { ActionRowBuilder, EmbedBuilder, GuildMember, InteractionReplyOptions, StringSelectMenuBuilder, StringSelectMenuInteraction, TextChannel, VoiceBasedChannel, VoiceState } from "discord.js";
 import { getSongTime } from "./SongTime";
@@ -195,24 +196,34 @@ export class MusicPlayer {
     const nextSong: Song | undefined = this.queue.getNext();
     if (nextSong) {
       message = "Song playback failed";
-      await youtube
-        .stream(nextSong.url, {
-          discordPlayerCompatibility: true,
-        })
-        .then(async (stream) => {
-          message = "Playing: " + nextSong.title;
-          nextSong.started = Math.round(new Date().getTime() / 1000);
+      let stream = ytdl(nextSong.url, {
+        filter: "audioonly",
+      });
+      message = "Playing: " + nextSong.title;
+      nextSong.started = Math.round(new Date().getTime() / 1000);
 
-          const resource = createAudioResource(stream.stream, {
-            inputType: stream.type,
-          });
-          this.player.play(resource);
-          this.startPlaying(nextSong);
-        })
-        .catch((error) => {
-          console.log("Failed stream: " + error);
-          this.stopPlaying();
-        });
+      const resource = createAudioResource(stream);
+      this.player.play(resource);
+      this.startPlaying(nextSong);
+
+      // await youtube
+      //   .stream(nextSong.url, {
+      //     discordPlayerCompatibility: true,
+      //   })
+      //   .then(async (stream) => {
+      //     message = "Playing: " + nextSong.title;
+      //     nextSong.started = Math.round(new Date().getTime() / 1000);
+
+      //     const resource = createAudioResource(stream.stream, {
+      //       inputType: stream.type,
+      //     });
+      //     this.player.play(resource);
+      //     this.startPlaying(nextSong);
+      //   })
+      //   .catch((error) => {
+      //     console.log("Failed stream: " + error);
+      //     this.stopPlaying();
+      //   });
       if (!this.isPlaying) {
         message = "Failed stream: " + nextSong.title;
         if (this.queue.size() > 0) {
