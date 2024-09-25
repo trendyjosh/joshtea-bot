@@ -3,8 +3,8 @@ import { Song } from "./Song";
 import { getSongTime } from "./SongTime";
 import shuffleArray from "shuffle-array";
 import youtube from "play-dl";
-import { YouTubeVideo } from "play-dl";
 import validUrl from "valid-url";
+import ytdl, { MoreVideoDetails } from "@distube/ytdl-core";
 
 export class SongQueue {
   private queue: Array<Song> = new Array<Song>();
@@ -66,9 +66,9 @@ export class SongQueue {
    * @param textChannel The text channel the command was sent in
    * @returns Song title
    */
-  private queueYoutubeSong(youtubeVideoDetails: YouTubeVideo, textChannel: TextBasedChannel): string {
-    const title = youtubeVideoDetails.title ?? youtubeVideoDetails.url;
-    const song = new Song(title, youtubeVideoDetails.durationInSec, youtubeVideoDetails.url, textChannel);
+  private queueYoutubeSong(youtubeVideoDetails: MoreVideoDetails, textChannel: TextBasedChannel): string {
+    const title = youtubeVideoDetails.title ?? youtubeVideoDetails.video_url;
+    const song = new Song(title, parseInt(youtubeVideoDetails.lengthSeconds), youtubeVideoDetails.video_url, textChannel);
     this.queue.push(song);
     return title;
   }
@@ -81,9 +81,13 @@ export class SongQueue {
    */
   private async addYoutubeLink(youtubeUrl: string, textChannel: TextBasedChannel): Promise<string> {
     try {
-      const yt_info = await youtube.video_info(youtubeUrl);
-      return this.queueYoutubeSong(yt_info.video_details, textChannel);
+      let basicInfo = await ytdl.getBasicInfo(youtubeUrl);
+      // let info = await ytdl.getInfo(youtubeUrl);
+      console.log(basicInfo);
+      const yt_info = await ytdl.getBasicInfo(youtubeUrl);
+      return this.queueYoutubeSong(yt_info.videoDetails, textChannel);
     } catch (err) {
+      console.log(err);
       return "Computer says no";
     }
   }
@@ -100,10 +104,11 @@ export class SongQueue {
       .then(async (playlist) => {
         return await playlist
           .all_videos()
-          .then((videos) => {
+          .then(async (videos) => {
             for (let $i = 0; $i < videos.length; $i++) {
               // Add each song to the list
-              this.queueYoutubeSong(videos[$i], textChannel);
+              const yt_info = await ytdl.getBasicInfo(videos[$i].url);
+              this.queueYoutubeSong(yt_info.videoDetails, textChannel);
             }
             return playlist.title;
           })
@@ -134,8 +139,9 @@ export class SongQueue {
       }
     } else {
       // Get top result from search
-      const yt_info = await youtube.search(songString, { limit: 1 });
-      return this.queueYoutubeSong(yt_info[0], textChannel);
+      const searchResults = await youtube.search(songString, { limit: 1 });
+      const yt_info = await ytdl.getBasicInfo(searchResults[0].url);
+      return this.queueYoutubeSong(yt_info.videoDetails, textChannel);
     }
     return "Why you do me like this? :(";
   }
